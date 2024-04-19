@@ -25,6 +25,7 @@ export class UserService {
     return this.prisma.user
       .create({
         data: user,
+        select: this.userSelect,
       })
       .catch(handleError);
   }
