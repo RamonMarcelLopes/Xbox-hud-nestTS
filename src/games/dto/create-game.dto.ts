@@ -49,4 +49,9 @@ export class CreateGameDto {
   })
   @IsNotEmpty()
   gameplayYouTubeUrl: string;
+  @ApiProperty({
+    description: 'Gênero do jogo',
+    example: 'FPS',
+  })
+  genreGame?: string;
 }

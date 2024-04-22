@@ -4,6 +4,7 @@ import { UpdateGameDto } from './dto/update-game.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Game } from './entities/game.entity';
 import { handleError } from 'src/utils/error';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class GamesService {
@@ -22,18 +23,39 @@ export class GamesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createGameDto: CreateGameDto): Promise<Game> {
-    const game: CreateGameDto = { ...createGameDto };
+    const game: Prisma.GamesCreateInput = {
+      title: createGameDto.title,
+      coverImageUrl: createGameDto.coverImageUrl,
+      year: createGameDto.year,
+      description: createGameDto.description,
+      imbScore: createGameDto.imbScore,
+      gameplayYouTubeUrl: createGameDto.gameplayYouTubeUrl,
+      trailerYoutubeUrl: createGameDto.trailerYoutubeUrl,
+      genres: {
+        connectOrCreate: {
+          where: { name: createGameDto.genreGame.toUpperCase() },
+          create: {
+            name: createGameDto.genreGame.toUpperCase(),
+          },
+        },
+      },
+    };
     return await this.prisma.games
       .create({
         data: game,
-        select: this.GameSelect,
+        include: {
+          genres: true,
+        },
       })
       .catch(handleError);
   }
 
   async findAll() {
     const list = await this.prisma.games.findMany({
-      select: this.GameSelect,
+      // select: this.GameSelect,
+      include: {
+        genres: true,
+      },
     });
     if (list.length === 0) {
       throw new NotFoundException('Não existem jogos cadastrados ainda');

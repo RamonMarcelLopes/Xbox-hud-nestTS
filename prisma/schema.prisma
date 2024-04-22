@@ -37,13 +37,17 @@ model Games {
   gameplayYouTubeUrl String
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
+
+  genres             Genres[]
 }
 
-model Genders {
+model Genres {
   id        String   @id @default(uuid())
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  games     Games[]
 }
 
 model Profile {

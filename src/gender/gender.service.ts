@@ -16,7 +16,7 @@ export class GenderService {
   constructor(private readonly prisma: PrismaService) {}
   async create(createGenderDto: CreateGenderDto): Promise<Gender> {
     const gender: CreateGenderDto = { ...createGenderDto };
-    return await this.prisma.genders
+    return await this.prisma.genres
       .create({
         data: gender,
         select: this.GenderSelect,
@@ -25,7 +25,7 @@ export class GenderService {
   }
 
   async findAll() {
-    const list = await this.prisma.genders.findMany({
+    const list = await this.prisma.genres.findMany({
       select: this.GenderSelect,
     });
     if (list.length === 0) {
@@ -36,7 +36,7 @@ export class GenderService {
   }
 
   async findOne(id: string) {
-    const record = await this.prisma.genders.findUnique({
+    const record = await this.prisma.genres.findUnique({
       where: { id },
       select: this.GenderSelect,
     });
@@ -50,7 +50,7 @@ export class GenderService {
     await this.findOne(id);
     const data: UpdateGenderDto = { ...updateGenderDto };
 
-    return this.prisma.genders
+    return this.prisma.genres
       .update({
         data,
         where: { id },
@@ -61,7 +61,7 @@ export class GenderService {
 
   async remove(id: string) {
     let genderDeleted = await this.findOne(id);
-    await this.prisma.genders.delete({ where: { id } }).catch(handleError);
+    await this.prisma.genres.delete({ where: { id } }).catch(handleError);
     return `Genero ${genderDeleted.name} deletado com sucesso`;
   }
 }
