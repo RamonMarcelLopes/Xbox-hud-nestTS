@@ -15,10 +15,14 @@ export class GenderService {
   };
   constructor(private readonly prisma: PrismaService) {}
   async create(createGenderDto: CreateGenderDto): Promise<Gender> {
-    const gender: CreateGenderDto = { ...createGenderDto };
+    const gender = createGenderDto.name.toLocaleUpperCase();
+    const genderToCreate: CreateGenderDto = {
+      name: gender,
+    };
+
     return await this.prisma.genres
       .create({
-        data: gender,
+        data: genderToCreate,
         select: this.GenderSelect,
       })
       .catch(handleError);
@@ -48,11 +52,14 @@ export class GenderService {
 
   async update(id: string, updateGenderDto: UpdateGenderDto) {
     await this.findOne(id);
-    const data: UpdateGenderDto = { ...updateGenderDto };
+    const data: string = updateGenderDto.name.toLocaleUpperCase();
+    const dataToUpdate: UpdateGenderDto = {
+      name: data,
+    };
 
     return this.prisma.genres
       .update({
-        data,
+        data: dataToUpdate,
         where: { id },
         select: this.GenderSelect,
       })

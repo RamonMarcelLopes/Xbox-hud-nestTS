@@ -5,6 +5,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Game } from './entities/game.entity';
 import { handleError } from 'src/utils/error';
 import { Prisma } from '@prisma/client';
+import { disconnect } from 'process';
+import { error } from 'console';
 
 @Injectable()
 export class GamesService {
@@ -32,11 +34,8 @@ export class GamesService {
       gameplayYouTubeUrl: createGameDto.gameplayYouTubeUrl,
       trailerYoutubeUrl: createGameDto.trailerYoutubeUrl,
       genres: {
-        connectOrCreate: {
-          where: { name: createGameDto.genreGame.toUpperCase() },
-          create: {
-            name: createGameDto.genreGame.toUpperCase(),
-          },
+        connect: {
+          name: createGameDto.genreGame.toUpperCase(),
         },
       },
     };
@@ -67,7 +66,9 @@ export class GamesService {
   async findOne(id: string) {
     const record = await this.prisma.games.findUnique({
       where: { id },
-      select: this.GameSelect,
+      include: {
+        genres: true,
+      },
     });
     if (!id) {
       throw new NotFoundException(`registro com o id: ${id} não encontrado`);
@@ -76,18 +77,56 @@ export class GamesService {
   }
 
   async update(id: string, updateGameDto: UpdateGameDto) {
-    await this.findOne(id);
-    const data: UpdateGameDto = { ...updateGameDto };
+    const data: Prisma.GamesUpdateInput = {
+      title: updateGameDto.title,
+      coverImageUrl: updateGameDto.coverImageUrl,
+      year: updateGameDto.year,
+      description: updateGameDto.description,
+      imbScore: updateGameDto.imbScore,
+      gameplayYouTubeUrl: updateGameDto.gameplayYouTubeUrl,
+      trailerYoutubeUrl: updateGameDto.trailerYoutubeUrl,
+      genres: {
+        connect: {
+          name: updateGameDto.genreGame.toUpperCase(),
+        },
+      },
+    };
 
     return this.prisma.games
       .update({
-        data,
         where: { id },
-        select: this.GameSelect,
+        data,
+        include: {
+          genres: true,
+        },
       })
       .catch(handleError);
   }
+  async disconnect(id: string, updateGameDto: UpdateGameDto) {
+    const gameToUpdate = await this.findOne(id);
 
+    const index = gameToUpdate.genres.findIndex(
+      (genre) => genre.name === updateGameDto.genreGame.toUpperCase(),
+    );
+    if (index !== -1) {
+      const data = {
+        genres: {
+          disconnect: {
+            name: gameToUpdate.genres[index].name,
+          },
+        },
+      };
+      return this.prisma.games.update({
+        where: { id },
+        data,
+        include: {
+          genres: true,
+        },
+      });
+    } else {
+      throw new NotFoundException(`genero não encontrado`);
+    }
+  }
   async remove(id: string) {
     let gameDeleted = await this.findOne(id);
     await this.prisma.games.delete({ where: { id } }).catch(handleError);

@@ -49,10 +49,19 @@ export class GamesController {
   }
 
   @ApiOperation({
+    summary: 'remove um genero do jogo apartir de seu nome ',
+  })
+  @Patch('removegenre/:id')
+  disconnect(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
+    return this.gamesService.disconnect(id, updateGameDto);
+  }
+  ////
+  @ApiOperation({
     summary: 'remove um  jogo do catalogo apartir de seu id',
   })
-  @Delete(':id')
+  @Delete('deletegame/:id')
   remove(@Param('id') id: string) {
     return this.gamesService.remove(id);
   }
+  ///
 }
