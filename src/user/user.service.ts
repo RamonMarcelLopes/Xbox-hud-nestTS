@@ -17,6 +17,7 @@ export class UserService {
     isAdmin: true,
     createdAt: true,
     updatedAt: false,
+    profiles: true,
   };
   constructor(private readonly prisma: PrismaService) {}
 

@@ -5,8 +5,6 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Game } from './entities/game.entity';
 import { handleError } from 'src/utils/error';
 import { Prisma } from '@prisma/client';
-import { disconnect } from 'process';
-import { error } from 'console';
 
 @Injectable()
 export class GamesService {
