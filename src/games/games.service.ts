@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Game } from './entities/game.entity';
 import { handleError } from 'src/utils/error';
 import { Prisma } from '@prisma/client';
+import { RemoveGenreDto } from './dto/remove-genre.dto';
 
 @Injectable()
 export class GamesService {
@@ -100,11 +101,11 @@ export class GamesService {
       })
       .catch(handleError);
   }
-  async disconnect(id: string, updateGameDto: UpdateGameDto) {
+  async disconnect(id: string, removeGenreDto: RemoveGenreDto) {
     const gameToUpdate = await this.findOne(id);
 
     const index = gameToUpdate.genres.findIndex(
-      (genre) => genre.name === updateGameDto.genreGame.toUpperCase(),
+      (genre) => genre.name === removeGenreDto.genreGame.toUpperCase(),
     );
     if (index !== -1) {
       const data = {

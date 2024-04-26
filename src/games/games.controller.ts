@@ -11,6 +11,7 @@ import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RemoveGenreDto } from './dto/remove-genre.dto';
 @ApiTags('Games')
 @Controller('games')
 export class GamesController {
@@ -52,10 +53,10 @@ export class GamesController {
     summary: 'remove um genero do jogo apartir de seu nome ',
   })
   @Patch('removegenre/:id')
-  disconnect(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
-    return this.gamesService.disconnect(id, updateGameDto);
+  disconnect(@Param('id') id: string, @Body() removeGenreDto: RemoveGenreDto) {
+    return this.gamesService.disconnect(id, removeGenreDto);
   }
-  ////
+
   @ApiOperation({
     summary: 'remove um  jogo do catalogo apartir de seu id',
   })
@@ -63,5 +64,4 @@ export class GamesController {
   remove(@Param('id') id: string) {
     return this.gamesService.remove(id);
   }
-  ///
 }
