@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -14,6 +18,14 @@ export class FavoriteService {
   ) {}
   async create(id: string, createFavoriteDto: CreateFavoriteDto) {
     const perfil = await this.profile.findOne(id);
+
+    let verify = perfil.games.some(
+      (game) => game.id === createFavoriteDto.gameId,
+    );
+
+    if (!verify) {
+      throw new BadRequestException('voce nao possui esse jogo');
+    }
 
     let editavel = perfil.favoriteGames.some(
       (game) => game.id === createFavoriteDto.gameId,
