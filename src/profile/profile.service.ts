@@ -5,7 +5,6 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { handleError } from 'src/utils/error';
-import { connect } from 'http2';
 
 @Injectable()
 export class ProfileService {
@@ -41,6 +40,7 @@ export class ProfileService {
           },
         },
         games: true,
+        favoriteGames: true,
       },
     });
   }
@@ -78,6 +78,7 @@ export class ProfileService {
           },
         },
         games: true,
+        favoriteGames: true,
       },
     });
     if (!record) {

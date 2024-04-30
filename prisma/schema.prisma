@@ -23,7 +23,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profiles Profile[] 
+  profiles Profile[]
 }
 
 model Games {
@@ -38,9 +38,11 @@ model Games {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  genres             Genres[]
+  genres Genres[]
 
   profile Profile[]
+
+   favoriteGamesProfile Profile[] @relation(name: "FavoriteGames")
 }
 
 model Genres {
@@ -49,7 +51,7 @@ model Genres {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  games     Games[]
+  games Games[]
 }
 
 model Profile {
@@ -58,9 +60,11 @@ model Profile {
   imageUrl  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade )
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   games Games[]
+
+  favoriteGames Games[] @relation(name: "FavoriteGames")
 }

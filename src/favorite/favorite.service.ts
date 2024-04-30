@@ -1,0 +1,59 @@
+import { Injectable } from '@nestjs/common';
+import { CreateFavoriteDto } from './dto/create-favorite.dto';
+import { UpdateFavoriteDto } from './dto/update-favorite.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
+import { ProfileService } from 'src/profile/profile.service';
+import { handleError } from 'src/utils/error';
+
+@Injectable()
+export class FavoriteService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly profile: ProfileService,
+  ) {}
+  async create(id: string, createFavoriteDto: CreateFavoriteDto) {
+    const perfil = await this.profile.findOne(id);
+
+    let editavel = perfil.favoriteGames.some(
+      (game) => game.id === createFavoriteDto.gameId,
+    );
+
+    if (!editavel) {
+      const data: Prisma.ProfileUpdateInput = {
+        favoriteGames: {
+          connect: {
+            id: createFavoriteDto.gameId,
+          },
+        },
+      };
+      return await this.prisma.profile
+        .update({
+          where: { id },
+          data,
+          include: { favoriteGames: true },
+        })
+        .catch(handleError);
+    } else {
+      const data: Prisma.ProfileUpdateInput = {
+        favoriteGames: {
+          disconnect: {
+            id: createFavoriteDto.gameId,
+          },
+        },
+      };
+      return await this.prisma.profile
+        .update({
+          where: { id },
+          data,
+          include: { favoriteGames: true },
+        })
+        .catch(handleError);
+    }
+  }
+
+  async findAll(id: string) {
+    const perfil = await this.profile.findOne(id);
+    return perfil.favoriteGames;
+  }
+}
