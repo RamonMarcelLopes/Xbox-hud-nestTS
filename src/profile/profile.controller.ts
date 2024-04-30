@@ -1,3 +1,4 @@
+import { BuyGameDto } from './dto/buy-game.dto';
 import {
   Controller,
   Get,
@@ -11,6 +12,7 @@ import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+
 @ApiTags('Profile')
 @Controller('profile')
 export class ProfileController {
@@ -44,6 +46,15 @@ export class ProfileController {
   update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
     return this.profileService.update(id, updateProfileDto);
   }
+  ///
+  @ApiOperation({
+    summary: 'adicionar(comprar) um jogo para perfil ',
+  })
+  @Patch('buygame/:id')
+  buyGame(@Param('id') id: string, @Body() buyGameDto: BuyGameDto) {
+    return this.profileService.buyGame(id, buyGameDto);
+  }
+  ///
   @ApiOperation({
     summary: 'deleta um perfil cadastrado apartir de seu id ',
   })

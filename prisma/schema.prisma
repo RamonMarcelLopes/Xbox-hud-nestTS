@@ -39,6 +39,8 @@ model Games {
   updatedAt          DateTime @updatedAt
 
   genres             Genres[]
+
+  profile Profile[]
 }
 
 model Genres {
@@ -59,4 +61,6 @@ model Profile {
   
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade )
   userId String
+
+  games Games[]
 }

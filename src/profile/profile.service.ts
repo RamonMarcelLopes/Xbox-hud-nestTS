@@ -1,9 +1,11 @@
+import { BuyGameDto } from './dto/buy-game.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { handleError } from 'src/utils/error';
+import { connect } from 'http2';
 
 @Injectable()
 export class ProfileService {
@@ -38,10 +40,29 @@ export class ProfileService {
             isAdmin: true,
           },
         },
+        games: true,
       },
     });
   }
-
+  async buyGame(id: string, buyGameDto: BuyGameDto) {
+    await this.findOne(id);
+    const data = {
+      games: {
+        connect: {
+          id: buyGameDto.gameId,
+        },
+      },
+    };
+    return this.prisma.profile
+      .update({
+        where: { id },
+        data,
+        include: {
+          games: true,
+        },
+      })
+      .catch(handleError);
+  }
   async findOne(id: string) {
     const record = await this.prisma.profile.findUnique({
       where: { id },
@@ -56,6 +77,7 @@ export class ProfileService {
             isAdmin: true,
           },
         },
+        games: true,
       },
     });
     if (!record) {
