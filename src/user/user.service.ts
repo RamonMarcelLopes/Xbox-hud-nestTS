@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from './entities/user.entity';
 import { handleError } from 'src/utils/error';
 import { error } from 'console';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -21,8 +22,12 @@ export class UserService {
   };
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createUserDto: CreateUserDto): Promise<User> {
-    const user: CreateUserDto = { ...createUserDto };
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user: CreateUserDto = {
+      ...createUserDto,
+      password: await bcrypt.hash(createUserDto.password, 10),
+    };
+
     return this.prisma.user
       .create({
         data: user,
