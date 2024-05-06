@@ -18,13 +18,14 @@ export class AuthService {
 
     const isHashValid = await bcrypt.compare(password, user.password);
 
+    let userId = user.id;
     if (!user) {
       throw new UnauthorizedException('Usuário e/ou senha inválidos');
     }
     delete user.password;
 
     return {
-      token: this.jwtService.sign({ email }),
+      token: this.jwtService.sign({ email, userId }),
       user,
     };
   }
