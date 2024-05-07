@@ -9,6 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { ProfileService } from 'src/profile/profile.service';
 import { handleError } from 'src/utils/error';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class FavoriteService {
@@ -64,7 +65,9 @@ export class FavoriteService {
     }
   }
 
-  async findAll(id: string) {
+  async findAll(user: User, id: string) {
+    console.log(user);
+
     const perfil = await this.profile.findOne(id);
     return perfil.favoriteGames;
   }

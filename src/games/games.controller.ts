@@ -6,13 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RemoveGenreDto } from './dto/remove-genre.dto';
+import { AuthGuard } from '@nestjs/passport';
 @ApiTags('Games')
+@UseGuards(AuthGuard())
+@ApiBearerAuth('JWT')
 @Controller('games')
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {}
