@@ -1,3 +1,4 @@
+import { User } from './../user/entities/user.entity';
 import { BuyGameDto } from './dto/buy-game.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
@@ -9,11 +10,11 @@ import { handleError } from 'src/utils/error';
 @Injectable()
 export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
-  async create(createProfileDto: CreateProfileDto) {
+  async create(user: User, createProfileDto: CreateProfileDto) {
     const data: Prisma.ProfileCreateInput = {
       user: {
         connect: {
-          id: createProfileDto.userId,
+          id: user.id,
         },
       },
       title: createProfileDto.title,

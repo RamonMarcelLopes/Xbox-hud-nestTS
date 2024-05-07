@@ -14,6 +14,8 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { LoggedUser } from 'src/auth/logged-user.dercorator';
+import { User } from 'src/user/entities/user.entity';
 
 @ApiTags('Profile')
 @UseGuards(AuthGuard())
@@ -26,8 +28,8 @@ export class ProfileController {
     summary: 'cria um novo perfil',
   })
   @Post()
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profileService.create(createProfileDto);
+  create(@LoggedUser() user: User, @Body() createProfileDto: CreateProfileDto) {
+    return this.profileService.create(user, createProfileDto);
   }
   @ApiOperation({
     summary: 'lista todos os perfis cadastrados em todas as contas ',

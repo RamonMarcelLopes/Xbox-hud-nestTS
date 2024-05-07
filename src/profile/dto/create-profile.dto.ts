@@ -10,9 +10,4 @@ export class CreateProfileDto {
     example: 'https://jacaimages.vercel.app/imgs/miscellaneous/dog.png',
   })
   imageUrl: string;
-  @ApiProperty({
-    description: 'Id do usuário',
-    example: '3b140e0f-efdb-49f2-a39d-b28314ee20a9',
-  })
-  userId: string;
 }
