@@ -4,6 +4,7 @@ import { LoginResponseDto } from './dto/login-response.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -16,17 +17,22 @@ export class AuthService {
 
     const user = await this.prisma.user.findUnique({ where: { email } });
 
-    const isHashValid = await bcrypt.compare(password, user.password);
-
-    let userId = user.id;
     if (!user) {
       throw new UnauthorizedException('Usuário e/ou senha inválidos');
     }
-    delete user.password;
+    let userId = user.id;
 
-    return {
-      token: this.jwtService.sign({ email, userId }),
-      user,
-    };
+    const isHashValid = await bcrypt.compare(password, user.password);
+
+    if (isHashValid) {
+      delete user.password;
+
+      return {
+        token: this.jwtService.sign({ email, userId }),
+        user,
+      };
+    } else {
+      throw new UnauthorizedException('invalid credentials');
+    }
   }
 }
