@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -58,9 +63,19 @@ export class UserService {
     return record;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    await this.findOne(id);
-    const data: UpdateUserDto = { ...updateUserDto };
+  async update(user: User, updateUserDto: UpdateUserDto) {
+    await this.findOne(user.id);
+    let id = user.id;
+
+    let data: UpdateUserDto = {
+      ...updateUserDto,
+    };
+    if (updateUserDto.password) {
+      data = {
+        ...updateUserDto,
+        password: await bcrypt.hash(updateUserDto.password, 10),
+      };
+    }
     return this.prisma.user.update({
       data,
       where: { id },
@@ -68,8 +83,9 @@ export class UserService {
     });
   }
 
-  async remove(id: string) {
-    let userDeleted = await this.findOne(id);
+  async remove(user: User) {
+    let userDeleted = await this.findOne(user.id);
+    let id = user.id;
     await this.prisma.user.delete({ where: { id } }).catch(handleError);
     return `Usuario ${userDeleted.name} deletado com sucesso`;
   }

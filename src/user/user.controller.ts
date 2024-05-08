@@ -13,6 +13,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { LoggedUser } from 'src/auth/logged-user.dercorator';
+import { User } from './entities/user.entity';
 
 @ApiTags('user')
 @UseGuards(AuthGuard())
@@ -45,18 +47,18 @@ export class UserController {
   }
 
   @ApiOperation({
-    summary: 'Edita um usuario pelo id',
+    summary: 'Edita o usuario logado no momento',
   })
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  @Patch()
+  update(@LoggedUser() user: User, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(user, updateUserDto);
   }
 
   @ApiOperation({
-    summary: 'Deleta um usuario pelo id',
+    summary: 'Deleta o usuario logado no momento',
   })
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  @Delete()
+  remove(@LoggedUser() user: User) {
+    return this.userService.remove(user);
   }
 }

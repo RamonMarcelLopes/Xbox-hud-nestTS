@@ -15,7 +15,7 @@ export class CreateUserDto {
   name: string;
   @ApiProperty({
     description: 'adicionar uma senha ',
-    example: 'jacare2024',
+    example: 'Jacare@2024',
   })
   @IsNotEmpty()
   password: string;
