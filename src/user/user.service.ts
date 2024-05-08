@@ -57,7 +57,7 @@ export class UserService {
       where: { id },
       select: this.userSelect,
     });
-    if (!id) {
+    if (!record) {
       throw new NotFoundException(`registro com o id: ${id} não encontrado`);
     }
     return record;

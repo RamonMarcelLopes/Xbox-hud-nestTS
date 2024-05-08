@@ -44,7 +44,7 @@ export class GenderService {
       where: { id },
       select: this.GenderSelect,
     });
-    if (!id) {
+    if (!record) {
       throw new NotFoundException(`registro com o id: ${id} não encontrado`);
     }
     return record;
