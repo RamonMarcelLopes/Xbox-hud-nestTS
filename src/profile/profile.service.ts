@@ -1,6 +1,10 @@
 import { User } from './../user/entities/user.entity';
 import { BuyGameDto } from './dto/buy-game.dto';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Prisma } from '@prisma/client';
@@ -38,6 +42,7 @@ export class ProfileService {
             name: true,
             email: true,
             isAdmin: true,
+            id: true,
           },
         },
         games: true,
@@ -45,8 +50,14 @@ export class ProfileService {
       },
     });
   }
-  async buyGame(id: string, buyGameDto: BuyGameDto) {
-    await this.findOne(id);
+  async buyGame(user: User, id: string, buyGameDto: BuyGameDto) {
+    let findProfile = await this.findOne(id);
+
+    if (findProfile.user.id != user.id) {
+      throw new UnauthorizedException(
+        'você não tem permissão para editar este perfil',
+      );
+    }
     const data = {
       games: {
         connect: {
@@ -76,6 +87,7 @@ export class ProfileService {
             name: true,
             email: true,
             isAdmin: true,
+            id: true,
           },
         },
         games: true,

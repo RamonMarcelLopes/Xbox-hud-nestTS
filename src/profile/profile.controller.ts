@@ -1,3 +1,4 @@
+import { User } from './../user/entities/user.entity';
 import { BuyGameDto } from './dto/buy-game.dto';
 import {
   Controller,
@@ -15,7 +16,6 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { LoggedUser } from 'src/auth/logged-user.dercorator';
-import { User } from 'src/user/entities/user.entity';
 
 @ApiTags('Profile')
 @UseGuards(AuthGuard())
@@ -57,8 +57,12 @@ export class ProfileController {
     summary: 'adicionar(comprar) um jogo para perfil ',
   })
   @Patch('buygame/:id')
-  buyGame(@Param('id') id: string, @Body() buyGameDto: BuyGameDto) {
-    return this.profileService.buyGame(id, buyGameDto);
+  buyGame(
+    @LoggedUser() user: User,
+    @Param('id') id: string,
+    @Body() buyGameDto: BuyGameDto,
+  ) {
+    return this.profileService.buyGame(user, id, buyGameDto);
   }
   ///
   @ApiOperation({
