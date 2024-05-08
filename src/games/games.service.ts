@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { User } from './../user/entities/user.entity';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -23,7 +28,13 @@ export class GamesService {
   };
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createGameDto: CreateGameDto): Promise<Game> {
+  async create(user: User, createGameDto: CreateGameDto): Promise<Game> {
+    if (!user.isAdmin) {
+      throw new UnauthorizedException(
+        'so administradores podem adicionar jogos ao catalogo',
+      );
+    }
+
     const game: Prisma.GamesCreateInput = {
       title: createGameDto.title,
       coverImageUrl: createGameDto.coverImageUrl,
@@ -69,13 +80,23 @@ export class GamesService {
         genres: true,
       },
     });
-    if (!id) {
+    if (!record) {
       throw new NotFoundException(`registro com o id: ${id} não encontrado`);
     }
     return record;
   }
 
-  async update(id: string, updateGameDto: UpdateGameDto) {
+  async update(user: User, id: string, updateGameDto: UpdateGameDto) {
+    await this.findOne(id);
+    if (!user.isAdmin) {
+      throw new UnauthorizedException(
+        'so administradores podem editar jogos do catalogo',
+      );
+    }
+    let genreName = updateGameDto.genreGame;
+    if (updateGameDto.genreGame) {
+      genreName = updateGameDto.genreGame.toUpperCase();
+    }
     const data: Prisma.GamesUpdateInput = {
       title: updateGameDto.title,
       coverImageUrl: updateGameDto.coverImageUrl,
@@ -86,10 +107,25 @@ export class GamesService {
       trailerYoutubeUrl: updateGameDto.trailerYoutubeUrl,
       genres: {
         connect: {
-          name: updateGameDto.genreGame.toUpperCase(),
+          name: genreName,
         },
       },
     };
+    function removeUndefinedProps(obj: any) {
+      for (const key in obj) {
+        if (obj[key] === undefined) {
+          delete obj[key];
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          removeUndefinedProps(obj[key]);
+        }
+      }
+    }
+    removeUndefinedProps(data);
+
+    const isGenresConnectEmpty = Object.keys(data.genres.connect).length === 0;
+    if (isGenresConnectEmpty) {
+      delete data.genres;
+    }
 
     return this.prisma.games
       .update({
@@ -101,8 +137,14 @@ export class GamesService {
       })
       .catch(handleError);
   }
-  async disconnect(id: string, removeGenreDto: RemoveGenreDto) {
+  async disconnect(user: User, id: string, removeGenreDto: RemoveGenreDto) {
     const gameToUpdate = await this.findOne(id);
+
+    if (!user.isAdmin) {
+      throw new UnauthorizedException(
+        'so administradores podem editar jogos do catalogo',
+      );
+    }
 
     const index = gameToUpdate.genres.findIndex(
       (genre) => genre.name === removeGenreDto.genreGame.toUpperCase(),
@@ -126,7 +168,12 @@ export class GamesService {
       throw new NotFoundException(`genero não encontrado`);
     }
   }
-  async remove(id: string) {
+  async remove(user: User, id: string) {
+    if (!user.isAdmin) {
+      throw new UnauthorizedException(
+        'so administradores podem remover  jogos do catalogo',
+      );
+    }
     let gameDeleted = await this.findOne(id);
     await this.prisma.games.delete({ where: { id } }).catch(handleError);
     return `Game ${gameDeleted.title} deletado com sucesso`;

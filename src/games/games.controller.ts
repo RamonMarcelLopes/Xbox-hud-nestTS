@@ -14,6 +14,8 @@ import { UpdateGameDto } from './dto/update-game.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RemoveGenreDto } from './dto/remove-genre.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { LoggedUser } from 'src/auth/logged-user.dercorator';
+import { User } from 'src/user/entities/user.entity';
 @ApiTags('Games')
 @UseGuards(AuthGuard())
 @ApiBearerAuth('JWT')
@@ -25,8 +27,8 @@ export class GamesController {
     summary: 'adiciona um novo jogo no catalogo',
   })
   @Post()
-  create(@Body() createGameDto: CreateGameDto) {
-    return this.gamesService.create(createGameDto);
+  create(@LoggedUser() user: User, @Body() createGameDto: CreateGameDto) {
+    return this.gamesService.create(user, createGameDto);
   }
 
   @ApiOperation({
@@ -49,23 +51,31 @@ export class GamesController {
     summary: 'edita um  jogo do catalogo apartir de seu id',
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
-    return this.gamesService.update(id, updateGameDto);
+  update(
+    @LoggedUser() user: User,
+    @Param('id') id: string,
+    @Body() updateGameDto: UpdateGameDto,
+  ) {
+    return this.gamesService.update(user, id, updateGameDto);
   }
 
   @ApiOperation({
     summary: 'remove um genero do jogo apartir de seu nome ',
   })
   @Patch('removegenre/:id')
-  disconnect(@Param('id') id: string, @Body() removeGenreDto: RemoveGenreDto) {
-    return this.gamesService.disconnect(id, removeGenreDto);
+  disconnect(
+    @LoggedUser() user: User,
+    @Param('id') id: string,
+    @Body() removeGenreDto: RemoveGenreDto,
+  ) {
+    return this.gamesService.disconnect(user, id, removeGenreDto);
   }
 
   @ApiOperation({
     summary: 'remove um  jogo do catalogo apartir de seu id',
   })
   @Delete('deletegame/:id')
-  remove(@Param('id') id: string) {
-    return this.gamesService.remove(id);
+  remove(@LoggedUser() user: User, @Param('id') id: string) {
+    return this.gamesService.remove(user, id);
   }
 }
