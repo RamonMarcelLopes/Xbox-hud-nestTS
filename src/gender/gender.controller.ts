@@ -13,6 +13,8 @@ import { CreateGenderDto } from './dto/create-gender.dto';
 import { UpdateGenderDto } from './dto/update-gender.dto';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { LoggedUser } from 'src/auth/logged-user.dercorator';
+import { User } from 'src/user/entities/user.entity';
 
 @ApiTags('Genero')
 @UseGuards(AuthGuard())
@@ -25,8 +27,8 @@ export class GenderController {
     summary: 'cria um novo genero',
   })
   @Post()
-  create(@Body() createGenderDto: CreateGenderDto) {
-    return this.genderService.create(createGenderDto);
+  create(@LoggedUser() user: User, @Body() createGenderDto: CreateGenderDto) {
+    return this.genderService.create(user, createGenderDto);
   }
 
   @ApiOperation({
@@ -49,15 +51,19 @@ export class GenderController {
     summary: 'edita um genero apartir de seu id',
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGenderDto: UpdateGenderDto) {
-    return this.genderService.update(id, updateGenderDto);
+  update(
+    @LoggedUser() user: User,
+    @Param('id') id: string,
+    @Body() updateGenderDto: UpdateGenderDto,
+  ) {
+    return this.genderService.update(user, id, updateGenderDto);
   }
 
   @ApiOperation({
     summary: 'deleta um genero apartir de seu id',
   })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.genderService.remove(id);
+  remove(@LoggedUser() user: User, @Param('id') id: string) {
+    return this.genderService.remove(user, id);
   }
 }
