@@ -74,6 +74,11 @@ export class FavoriteService {
 
   async findAll(user: User, id: string) {
     const perfil = await this.profile.findOne(id);
+    if (perfil.user.id != user.id) {
+      throw new UnauthorizedException(
+        'voce so pode listar seus proprios jogos favoritos ',
+      );
+    }
     return perfil.favoriteGames;
   }
 }
