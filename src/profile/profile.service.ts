@@ -122,8 +122,6 @@ export class ProfileService {
 
   async remove(user: User, id: string) {
     let findProfile = await this.findOne(id);
-    console.log(findProfile.user.id);
-    console.log(user.id);
 
     if (findProfile.user.id != user.id) {
       throw new UnauthorizedException(

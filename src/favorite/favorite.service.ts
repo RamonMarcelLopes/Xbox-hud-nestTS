@@ -66,8 +66,6 @@ export class FavoriteService {
   }
 
   async findAll(user: User, id: string) {
-    console.log(user);
-
     const perfil = await this.profile.findOne(id);
     return perfil.favoriteGames;
   }
