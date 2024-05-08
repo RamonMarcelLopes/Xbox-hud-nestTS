@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
@@ -17,8 +18,14 @@ export class FavoriteService {
     private readonly prisma: PrismaService,
     private readonly profile: ProfileService,
   ) {}
-  async create(id: string, createFavoriteDto: CreateFavoriteDto) {
+  async create(user: User, id: string, createFavoriteDto: CreateFavoriteDto) {
     const perfil = await this.profile.findOne(id);
+
+    if (perfil.user.id != user.id) {
+      throw new UnauthorizedException(
+        'voce so pode favoritar jogos para voce mesmo ',
+      );
+    }
 
     let verify = perfil.games.some(
       (game) => game.id === createFavoriteDto.gameId,

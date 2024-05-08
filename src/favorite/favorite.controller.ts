@@ -25,10 +25,11 @@ export class FavoriteController {
   })
   @Patch('or-unfavorite/:id')
   create(
+    @LoggedUser() user: User,
     @Param('id') id: string,
     @Body() createFavoriteDto: CreateFavoriteDto,
   ) {
-    return this.favoriteService.create(id, createFavoriteDto);
+    return this.favoriteService.create(user, id, createFavoriteDto);
   }
   @ApiOperation({
     summary: 'lista todos os jogos  favoritos do perfil apartir de seu id ',
