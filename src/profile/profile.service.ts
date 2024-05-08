@@ -100,8 +100,14 @@ export class ProfileService {
     return record;
   }
 
-  async update(id: string, updateProfileDto: UpdateProfileDto) {
-    await this.findOne(id);
+  async update(user: User, id: string, updateProfileDto: UpdateProfileDto) {
+    let findProfile = await this.findOne(id);
+
+    if (findProfile.user.id != user.id) {
+      throw new UnauthorizedException(
+        'você não tem permissão para editar este perfil',
+      );
+    }
     const data: Prisma.ProfileUpdateInput = {
       title: updateProfileDto.title,
       imageUrl: updateProfileDto.imageUrl,
@@ -114,13 +120,22 @@ export class ProfileService {
       .catch(handleError);
   }
 
-  async remove(id: string) {
-    let profileToDelete = await this.findOne(id);
+  async remove(user: User, id: string) {
+    let findProfile = await this.findOne(id);
+    console.log(findProfile.user.id);
+    console.log(user.id);
+
+    if (findProfile.user.id != user.id) {
+      throw new UnauthorizedException(
+        'você não tem permissão para Deletar este perfil',
+      );
+    }
+
     await this.prisma.profile
       .delete({
         where: { id },
       })
       .catch(handleError);
-    return `perfil ${profileToDelete.title} deletado com sucesso`;
+    return `perfil ${findProfile.title} deletado com sucesso`;
   }
 }

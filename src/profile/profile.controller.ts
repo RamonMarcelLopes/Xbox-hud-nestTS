@@ -49,8 +49,12 @@ export class ProfileController {
     summary: 'edita um perfil cadastrado apartir de seu id ',
   })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(id, updateProfileDto);
+  update(
+    @LoggedUser() user: User,
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.profileService.update(user, id, updateProfileDto);
   }
   ///
   @ApiOperation({
@@ -69,7 +73,7 @@ export class ProfileController {
     summary: 'deleta um perfil cadastrado apartir de seu id ',
   })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(id);
+  remove(@LoggedUser() user: User, @Param('id') id: string) {
+    return this.profileService.remove(user, id);
   }
 }
