@@ -146,8 +146,9 @@ export class GamesService {
       );
     }
 
+    let genreGame = removeGenreDto.genreGame.toUpperCase();
     const index = gameToUpdate.genres.findIndex(
-      (genre) => genre.name === removeGenreDto.genreGame.toUpperCase(),
+      (genre) => genre.name === genreGame,
     );
     if (index !== -1) {
       const data = {
